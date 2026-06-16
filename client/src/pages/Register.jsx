@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
+  const auth = useAuth();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,31 +36,13 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ name, email, password })
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        setError(data.message || 'Registration failed.');
+      const result = await auth.register(name, email, password);
+      if (!result.ok) {
+        setError(result.message || 'Registration failed.');
         setLoading(false);
         return;
       }
 
-      // store token if returned (non-httpOnly fallback)
-      if (data.token) {
-        try {
-          localStorage.setItem('token', data.token);
-        } catch (err) {
-          // ignore
-        }
-      }
-
-      // redirect to home or dashboard
       navigate('/');
     } catch (err) {
       console.error('Register error', err);
@@ -77,68 +62,24 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="register-form" noValidate>
           <label htmlFor="name">Name</label>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            required
-            autoComplete="name"
-          />
+          <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required autoComplete="name" />
 
           <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-          />
+          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoComplete="email" />
 
           <label htmlFor="password">Password</label>
           <div className="pw-row">
-            <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
-              required
-              autoComplete="new-password"
-            />
-            <button
-              type="button"
-              className="pw-toggle"
-              aria-pressed={showPassword}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              onClick={() => setShowPassword((s) => !s)}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </button>
+            <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" required autoComplete="new-password" />
+            <button type="button" className="pw-toggle" aria-pressed={showPassword} aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((s) => !s)}>{showPassword ? 'Hide' : 'Show'}</button>
           </div>
 
           <label htmlFor="confirm">Confirm Password</label>
-          <input
-            id="confirm"
-            type={showPassword ? 'text' : 'password'}
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Repeat your password"
-            required
-            autoComplete="new-password"
-          />
+          <input id="confirm" type={showPassword ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Repeat your password" required autoComplete="new-password" />
 
-          <button className="btn submit" type="submit" disabled={loading}>
-            {loading ? 'Creating account…' : 'Create account'}
-          </button>
+          <button className="btn submit" type="submit" disabled={loading}>{loading ? 'Creating account…' : 'Create account'}</button>
         </form>
 
-        <div className="login-link">
-          <span>Already have an account?</span> <a href="/login">Sign in</a>
-        </div>
+        <div className="login-link"> <span>Already have an account?</span> <a href="/login">Sign in</a> </div>
       </div>
 
       <style>{`
