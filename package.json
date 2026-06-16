@@ -1,0 +1,23 @@
+{
+  "name": "community-helpdesk-cyber-safety",
+  "version": "1.0.0",
+  "description": "Community Helpdesk for Cyber Safety Queries",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm start",
+    "client": "cd frontend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "cyber-safety",
+    "helpdesk",
+    "community",
+    "queries"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
